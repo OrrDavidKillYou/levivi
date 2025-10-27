@@ -58,17 +58,45 @@
     .niga {
       color: azure;
     }
+
+    /* Style for play button */
+    .music-btn {
+      font-size: 40px;
+      padding: 15px 40px;
+      background-color: violet;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      margin-top: 30px;
+      transition: 0.3s;
+    }
+
+    .music-btn:hover {
+      background-color: crimson;
+      color: white;
+    }
   </style>
 </head>
 
 <body>
   <h1>cursed levi ahhh</h1>
 
-  <!-- ✅ Background music (correct link) -->
-  <audio autoplay loop>
+  <!-- ✅ Music player (no autoplay) -->
+  <audio id="bg-music" loop>
     <source src="https://raw.githubusercontent.com/OrrDavidKillYou/LeviAhh/refs/heads/main/background-music.mp3" type="audio/mpeg">
     Your browser does not support the audio element.
   </audio>
+
+  <!-- ✅ Play button -->
+  <button class="music-btn" onclick="playMusic()">🎵 Play Music 🎵</button>
+
+  <script>
+    function playMusic() {
+      const audio = document.getElementById('bg-music');
+      audio.volume = 0.3; // sets 30% volume
+      audio.play();
+    }
+  </script>
 
   <div class="LEVII">
     <div class="leviah">
