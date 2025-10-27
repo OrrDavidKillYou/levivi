@@ -59,21 +59,28 @@
       color: azure;
     }
 
-    /* Style for play button */
-    .music-btn {
+    /* Style for buttons */
+    .music-btn, .stop-btn {
       font-size: 40px;
       padding: 15px 40px;
       background-color: violet;
       border: none;
       border-radius: 10px;
       cursor: pointer;
-      margin-top: 30px;
+      margin-top: 50px;
       transition: 0.3s;
     }
 
-    .music-btn:hover {
+    .music-btn:hover, .stop-btn:hover {
       background-color: crimson;
       color: white;
+    }
+
+    .button-container {
+      margin-top: 600px; /* push buttons down */
+      display: flex;
+      justify-content: center;
+      gap: 30px;
     }
   </style>
 </head>
@@ -87,18 +94,37 @@
     Your browser does not support the audio element.
   </audio>
 
-  <!-- Play button -->
-  <button class="music-btn" onclick="playMusic()">🎵 Play Music 🎵</button>
+  <!-- Buttons -->
+  <div class="button-container">
+    <button class="music-btn" id="play-btn" onclick="playMusic()">🎵 Play Music 🎵</button>
+    <button class="stop-btn" onclick="stopMusic()">⏹ Stop Music ⏹</button>
+  </div>
 
   <script>
+    let musicPlayed = false;
+
     function playMusic() {
+      if (!musicPlayed) {
+        const audio = document.getElementById('bg-music');
+        audio.volume = 0.3;
+        audio.play().then(() => {
+          console.log("Audio started playing");
+          musicPlayed = true;
+          document.getElementById('play-btn').disabled = true; // disable button
+          document.getElementById('play-btn').style.opacity = 0.5; // visually show disabled
+        }).catch(err => {
+          console.error("Audio failed to play:", err);
+        });
+      } else {
+        console.log("Music already played.");
+      }
+    }
+
+    function stopMusic() {
       const audio = document.getElementById('bg-music');
-      audio.volume = 1; // 30% volume
-      audio.play().then(() => {
-        console.log("Audio started playing");
-      }).catch(err => {
-        console.error("Audio failed to play:", err);
-      });
+      audio.pause();
+      audio.currentTime = 0; // reset to start
+      console.log("Music stopped");
     }
   </script>
 
