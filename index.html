@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Mini FPS Prototype</title>
+  <title>Mini Minecraft Prototype</title>
   <style>
     body { margin: 0; overflow: hidden; }
     canvas { display: block; }
@@ -21,117 +21,116 @@
 <body>
 <div id="instructions">Click to play</div>
 
-<script type="module">
-import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.158.0/build/three.module.js';
-import { PointerLockControls } from 'https://cdn.jsdelivr.net/npm/three@0.158.0/examples/jsm/controls/PointerLockControls.js';
+<!-- Use non-module Three.js and PointerLockControls -->
+<script src="https://cdn.jsdelivr.net/npm/three@0.158.0/build/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.158.0/examples/js/controls/PointerLockControls.js"></script>
 
+<script>
 let camera, scene, renderer, controls;
-let moveForward = false, moveBackward = false, moveLeft = false, moveRight = false;
+let moveForward=false, moveBackward=false, moveLeft=false, moveRight=false;
 let velocity = new THREE.Vector3();
 let prevTime = performance.now();
 
-// Scene setup
+// Scene
 scene = new THREE.Scene();
-scene.background = new THREE.Color(0x202020);
+scene.background = new THREE.Color(0x87ceeb); // sky
 
 // Camera
 camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 1000);
 camera.position.y = 2;
 
 // Renderer
-renderer = new THREE.WebGLRenderer();
+renderer = new THREE.WebGLRenderer({ antialias: true });
 renderer.setSize(window.innerWidth, window.innerHeight);
 document.body.appendChild(renderer.domElement);
 
-// PointerLockControls
-controls = new PointerLockControls(camera, document.body);
+// Controls
+controls = new THREE.PointerLockControls(camera, document.body);
 document.getElementById('instructions').addEventListener('click', () => controls.lock());
 controls.addEventListener('lock', () => document.getElementById('instructions').style.display = 'none');
 controls.addEventListener('unlock', () => document.getElementById('instructions').style.display = 'block');
 scene.add(controls.getObject());
 
-// Floor
-const floorGeometry = new THREE.PlaneGeometry(100, 100);
-const floorMaterial = new THREE.MeshStandardMaterial({ color: 0x555555 });
-const floor = new THREE.Mesh(floorGeometry, floorMaterial);
-floor.rotation.x = -Math.PI / 2;
-scene.add(floor);
-
-// Simple cubes
-const cubeGeometry = new THREE.BoxGeometry(2, 2, 2);
-const cubeMaterial = new THREE.MeshStandardMaterial({ color: 0xff0000 });
-// Place one cube in front of camera for visibility
-const cube = new THREE.Mesh(cubeGeometry, cubeMaterial);
-cube.position.set(0, 1, -5);
-scene.add(cube);
-// Add 9 random cubes
-for (let i = 0; i < 9; i++) {
-  const cube = new THREE.Mesh(cubeGeometry, cubeMaterial);
-  cube.position.set(Math.random()*40-20, 1, Math.random()*40-20);
-  scene.add(cube);
-}
-
 // Lighting
 const light = new THREE.DirectionalLight(0xffffff, 1);
-light.position.set(5, 10, 7.5);
+light.position.set(5,10,7.5);
 scene.add(light);
-const ambient = new THREE.AmbientLight(0xffffff, 0.3);
-scene.add(ambient);
+scene.add(new THREE.AmbientLight(0xffffff, 0.3));
+
+// Materials
+const grassMaterial = new THREE.MeshStandardMaterial({ color: 0x00ff00 });
+const dirtMaterial = new THREE.MeshStandardMaterial({ color: 0x8B4513 });
+const stoneMaterial = new THREE.MeshStandardMaterial({ color: 0x808080 });
+
+// Voxel world
+const blocks = [];
+const worldSize = 16;
+for(let x=0; x<worldSize; x++){
+  for(let z=0; z<worldSize; z++){
+    // grass
+    let cube = new THREE.Mesh(new THREE.BoxGeometry(1,1,1), grassMaterial);
+    cube.position.set(x,0,z);
+    scene.add(cube);
+    blocks.push(cube);
+    // dirt below
+    let dirt = new THREE.Mesh(new THREE.BoxGeometry(1,1,1), dirtMaterial);
+    dirt.position.set(x,-1,z);
+    scene.add(dirt);
+    blocks.push(dirt);
+  }
+}
+
+// Random stones
+for(let i=0;i<10;i++){
+  let stone = new THREE.Mesh(new THREE.BoxGeometry(1,1,1), stoneMaterial);
+  stone.position.set(Math.floor(Math.random()*worldSize),1,Math.floor(Math.random()*worldSize));
+  scene.add(stone);
+  blocks.push(stone);
+}
 
 // Movement
-const onKeyDown = function (event) {
-  switch(event.code) {
-    case 'ArrowUp':
-    case 'KeyW': moveForward = true; break;
-    case 'ArrowLeft':
-    case 'KeyA': moveLeft = true; break;
-    case 'ArrowDown':
-    case 'KeyS': moveBackward = true; break;
-    case 'ArrowRight':
-    case 'KeyD': moveRight = true; break;
+document.addEventListener('keydown', e=>{
+  switch(e.code){
+    case 'KeyW': case 'ArrowUp': moveForward=true; break;
+    case 'KeyS': case 'ArrowDown': moveBackward=true; break;
+    case 'KeyA': case 'ArrowLeft': moveLeft=true; break;
+    case 'KeyD': case 'ArrowRight': moveRight=true; break;
   }
-};
-const onKeyUp = function (event) {
-  switch(event.code) {
-    case 'ArrowUp':
-    case 'KeyW': moveForward = false; break;
-    case 'ArrowLeft':
-    case 'KeyA': moveLeft = false; break;
-    case 'ArrowDown':
-    case 'KeyS': moveBackward = false; break;
-    case 'ArrowRight':
-    case 'KeyD': moveRight = false; break;
+});
+document.addEventListener('keyup', e=>{
+  switch(e.code){
+    case 'KeyW': case 'ArrowUp': moveForward=false; break;
+    case 'KeyS': case 'ArrowDown': moveBackward=false; break;
+    case 'KeyA': case 'ArrowLeft': moveLeft=false; break;
+    case 'KeyD': case 'ArrowRight': moveRight=false; break;
   }
-};
-document.addEventListener('keydown', onKeyDown);
-document.addEventListener('keyup', onKeyUp);
+});
 
-// Animation loop
-function animate() {
+// Animate
+function animate(){
   requestAnimationFrame(animate);
   const time = performance.now();
-  const delta = (time - prevTime) / 1000;
+  const delta = (time - prevTime)/1000;
 
-  // Deceleration
-  velocity.x -= velocity.x * 10.0 * delta;
-  velocity.z -= velocity.z * 10.0 * delta;
+  velocity.x -= velocity.x*10*delta;
+  velocity.z -= velocity.z*10*delta;
 
-  const speed = 400.0; // movement speed
-  if (moveForward) velocity.z -= speed * delta;
-  if (moveBackward) velocity.z += speed * delta;
-  if (moveLeft) velocity.x -= speed * delta;
-  if (moveRight) velocity.x += speed * delta;
+  const speed = 5;
+  if(moveForward) velocity.z -= speed*delta;
+  if(moveBackward) velocity.z += speed*delta;
+  if(moveLeft) velocity.x -= speed*delta;
+  if(moveRight) velocity.x += speed*delta;
 
-  controls.moveRight(velocity.x * delta);
-  controls.moveForward(velocity.z * delta);
+  controls.moveRight(velocity.x);
+  controls.moveForward(velocity.z);
 
   prevTime = time;
   renderer.render(scene, camera);
 }
 animate();
 
-// Resize handling
-window.addEventListener('resize', () => {
+// Resize
+window.addEventListener('resize', ()=>{
   camera.aspect = window.innerWidth/window.innerHeight;
   camera.updateProjectionMatrix();
   renderer.setSize(window.innerWidth, window.innerHeight);
