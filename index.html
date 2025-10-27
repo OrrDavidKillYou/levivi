@@ -2,170 +2,140 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>HawkTuah</title>
-  <link rel="icon" type="image/png" href="https://i.imgur.com/KtdSDub.png">
+  <title>Mini FPS Prototype</title>
   <style>
-    body {
-      background-color: darkslategray;
-      color: azure;
-      font-size: 100px;
-      text-align: center;
-      margin: 0;
-      padding: 0;
-    }
-
-    .leviah, .leviahh {
-      display: flex;
-      justify-content: space-between;
-    }
-
-    .levi1, .levi2 {
-      width: 500px;
-    }
-
-    .levi {
+    body { margin: 0; overflow: hidden; }
+    canvas { display: block; }
+    #instructions {
       position: absolute;
       top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      height: 350px;
-    }
-
-    .LEVII {
-      color: violet;
-      font-size: 90px;
-    }
-
-    .levi_china {
-      position: absolute;
-      top: 87%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      font-size: 70px;
-    }
-
-    .nig {
-      display: flex;
-      justify-content: space-between;
-      color: cornflowerblue;
-    }
-
-    .aref, .aref2 {
-      color: cornflowerblue;
-      text-decoration-color: lightgreen;
-    }
-
-    .niga {
-      color: azure;
-    }
-
-    /* Style for buttons */
-    .music-btn, .stop-btn {
-      font-size: 40px;
-      padding: 15px 40px;
-      background-color: violet;
-      border: none;
-      border-radius: 10px;
-      cursor: pointer;
-      margin-top: 50px;
-      transition: 0.3s;
-    }
-
-    .music-btn:hover, .stop-btn:hover {
-      background-color: crimson;
+      width: 100%;
+      text-align: center;
       color: white;
-    }
-
-    .button-container {
-      margin-top: 600px; /* push buttons down */
-      display: flex;
-      justify-content: center;
-      gap: 30px;
+      font-family: sans-serif;
+      font-size: 24px;
+      cursor: pointer;
     }
   </style>
 </head>
-
 <body>
-  <h1>cursed levi ahhh</h1>
+<div id="instructions">Click to play</div>
 
-  <!-- Music player -->
-  <audio id="bg-music" loop>
-    <source src="https://raw.githubusercontent.com/OrrDavidKillYou/levivi/main/background-music.mp3" type="audio/mpeg">
-    Your browser does not support the audio element.
-  </audio>
+<script type="module">
+import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.158.0/build/three.module.js';
+import { PointerLockControls } from 'https://cdn.jsdelivr.net/npm/three@0.158.0/examples/jsm/controls/PointerLockControls.js';
 
-  <!-- Buttons -->
-  <div class="button-container">
-    <button class="music-btn" id="play-btn" onclick="playMusic()">🎵 Play Music 🎵</button>
-    <button class="stop-btn" onclick="stopMusic()">⏹ Stop Music ⏹</button>
-  </div>
+let camera, scene, renderer, controls;
+let moveForward = false, moveBackward = false, moveLeft = false, moveRight = false;
+let velocity = new THREE.Vector3();
+let prevTime = performance.now();
 
-  <script>
-    let musicPlayed = false;
+// Scene setup
+scene = new THREE.Scene();
+scene.background = new THREE.Color(0x202020);
 
-    function playMusic() {
-      if (!musicPlayed) {
-        const audio = document.getElementById('bg-music');
-        audio.volume = 1; // full volume
-        audio.play().then(() => {
-          console.log("Audio started playing");
-          musicPlayed = true;
-          document.getElementById('play-btn').disabled = true; // disable button
-          document.getElementById('play-btn').style.opacity = 0.5;
-        }).catch(err => {
-          console.error("Audio failed to play:", err);
-        });
-      }
-    }
+// Camera
+camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 1000);
+camera.position.y = 2;
 
-    function stopMusic() {
-      const audio = document.getElementById('bg-music');
-      audio.pause();
-      audio.currentTime = 0; // reset to start
-      console.log("Music stopped");
+// Renderer
+renderer = new THREE.WebGLRenderer();
+renderer.setSize(window.innerWidth, window.innerHeight);
+document.body.appendChild(renderer.domElement);
 
-      // Re-enable play button
-      musicPlayed = false;
-      const playBtn = document.getElementById('play-btn');
-      playBtn.disabled = false;
-      playBtn.style.opacity = 1;
-    }
-  </script>
+// PointerLockControls
+controls = new PointerLockControls(camera, document.body);
+document.getElementById('instructions').addEventListener('click', () => controls.lock());
+controls.addEventListener('lock', () => document.getElementById('instructions').style.display = 'none');
+controls.addEventListener('unlock', () => document.getElementById('instructions').style.display = 'block');
+scene.add(controls.getObject());
 
-  <div class="LEVII">
-    <div class="leviah">
-      <figure>
-        <img src="https://i.imgur.com/4uwJAMo.jpeg" class="levi1" />
-        <figcaption>levi football</figcaption>
-      </figure>
-      <figure>
-        <img src="https://i.imgur.com/ZHJMphT.jpeg" class="levi1"/>
-        <figcaption>levitler strong</figcaption>
-      </figure>
-    </div>
+// Floor
+const floorGeometry = new THREE.PlaneGeometry(100, 100);
+const floorMaterial = new THREE.MeshStandardMaterial({ color: 0x555555 });
+const floor = new THREE.Mesh(floorGeometry, floorMaterial);
+floor.rotation.x = -Math.PI / 2;
+scene.add(floor);
 
-    <div class="leviahh">
-      <figure>
-        <img src="https://i.imgur.com/pbYA8AB.jpeg" class="levi2"/>
-        <figcaption>levipolion</figcaption>
-      </figure>
-      <figure>
-        <img src="https://i.imgur.com/jEFcDfE.jpeg" class="levi2"/>
-        <figcaption>levi tyson</figcaption>
-      </figure>
-    </div>
+// Simple cubes
+const cubeGeometry = new THREE.BoxGeometry(2, 2, 2);
+const cubeMaterial = new THREE.MeshStandardMaterial({ color: 0xff0000 });
+// Place one cube in front of camera for visibility
+const cube = new THREE.Mesh(cubeGeometry, cubeMaterial);
+cube.position.set(0, 1, -5);
+scene.add(cube);
+// Add 9 random cubes
+for (let i = 0; i < 9; i++) {
+  const cube = new THREE.Mesh(cubeGeometry, cubeMaterial);
+  cube.position.set(Math.random()*40-20, 1, Math.random()*40-20);
+  scene.add(cube);
+}
 
-    <figure>
-      <img src="https://i.imgur.com/5qMpg45.jpeg" class="levi"/>
-      <figcaption class="levi_china">levi in chinese restaurant</figcaption>
-    </figure>
-  </div>
+// Lighting
+const light = new THREE.DirectionalLight(0xffffff, 1);
+light.position.set(5, 10, 7.5);
+scene.add(light);
+const ambient = new THREE.AmbientLight(0xffffff, 0.3);
+scene.add(ambient);
 
-  <a href="index.html" class="niga">to the main page</a>
+// Movement
+const onKeyDown = function (event) {
+  switch(event.code) {
+    case 'ArrowUp':
+    case 'KeyW': moveForward = true; break;
+    case 'ArrowLeft':
+    case 'KeyA': moveLeft = true; break;
+    case 'ArrowDown':
+    case 'KeyS': moveBackward = true; break;
+    case 'ArrowRight':
+    case 'KeyD': moveRight = true; break;
+  }
+};
+const onKeyUp = function (event) {
+  switch(event.code) {
+    case 'ArrowUp':
+    case 'KeyW': moveForward = false; break;
+    case 'ArrowLeft':
+    case 'KeyA': moveLeft = false; break;
+    case 'ArrowDown':
+    case 'KeyS': moveBackward = false; break;
+    case 'ArrowRight':
+    case 'KeyD': moveRight = false; break;
+  }
+};
+document.addEventListener('keydown', onKeyDown);
+document.addEventListener('keyup', onKeyUp);
 
-  <div class="nig">
-    <a href="https://www.best-israel-tours.com/" class="aref" target="_blank">levi website</a>
-    <a href="https://www.instagram.com/levizelkind/" class="aref2" target="_blank">levi insta</a>
-  </div>
+// Animation loop
+function animate() {
+  requestAnimationFrame(animate);
+  const time = performance.now();
+  const delta = (time - prevTime) / 1000;
+
+  // Deceleration
+  velocity.x -= velocity.x * 10.0 * delta;
+  velocity.z -= velocity.z * 10.0 * delta;
+
+  const speed = 400.0; // movement speed
+  if (moveForward) velocity.z -= speed * delta;
+  if (moveBackward) velocity.z += speed * delta;
+  if (moveLeft) velocity.x -= speed * delta;
+  if (moveRight) velocity.x += speed * delta;
+
+  controls.moveRight(velocity.x * delta);
+  controls.moveForward(velocity.z * delta);
+
+  prevTime = time;
+  renderer.render(scene, camera);
+}
+animate();
+
+// Resize handling
+window.addEventListener('resize', () => {
+  camera.aspect = window.innerWidth/window.innerHeight;
+  camera.updateProjectionMatrix();
+  renderer.setSize(window.innerWidth, window.innerHeight);
+});
+</script>
 </body>
 </html>
