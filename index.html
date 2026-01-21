@@ -1,1 +1,425 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Levi Casino & Gacha</title>
+<style>
+  body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: #111;
+    color: white;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
 
+  /* SCALE EVERYTHING 1.2x */
+  .scale-container {
+    transform: scale(1.2);
+    transform-origin: top center;
+    padding-bottom: 100px;
+  }
+
+  .header {
+    text-align: center;
+    margin-top: 20px;
+  }
+
+  .header h2 { margin: 0; }
+  .header div { margin-top: 5px; font-size: 18px; }
+
+  .game-container {
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    gap: 50px;
+    margin-top: 20px;
+    flex-wrap: wrap;
+    max-width: 1000px;
+  }
+
+  .game-section { display: flex; flex-direction: column; align-items: center; min-width: 250px; }
+
+  input, select, button {
+    margin-top: 10px;
+    padding: 8px;
+    font-size: 14px;
+    border-radius: 6px;
+    border: none;
+  }
+
+  button {
+    cursor: pointer;
+    background: #28a745;
+    color: white;
+    margin: 5px 0;
+    font-weight: bold;
+  }
+
+  button:hover { background: #23963b; }
+
+  .color-buttons button { width: 70px; font-weight: bold; }
+  #redBtn { background-color: red; }
+  #blackBtn { background-color: black; color: white; }
+  #numberBtn { background-color: blue; }
+  .selected { border: 2px solid yellow; }
+
+  .slot-machine { display: flex; justify-content: center; margin-top: 20px; }
+  .reel {
+    width: 80px; height: 80px; margin: 0 5px;
+    background: #222; border-radius: 10px;
+    box-shadow: 0 0 10px #000; overflow: hidden; position: relative;
+  }
+  .symbols { position: absolute; top: 0; width: 100%; }
+  .symbols img { display: block; width: 100%; height: 80px; object-fit: contain; }
+
+  /* Horse racing */
+  .horse-track { position: relative; width: 200px; height: 120px; border: 2px solid #555; background: #222; margin-top: 10px; }
+  .horse { position: absolute; width: 30px; height: 30px; text-align: center; font-weight: bold; }
+
+  /* Roulette */
+  .wheel-wrapper { width: 150px; height: 150px; position: relative; }
+  #wheel {
+    width: 100%; height: 100%;
+    transition: transform 5s cubic-bezier(0.1, 0.1, 0, 1);
+    user-select: none;
+  }
+  .dd { position: absolute; top: -10px; left: 50%; transform: translateX(-50%); height: 35px; z-index: 10; }
+
+  /* --- GACHA STYLES --- */
+  .gacha-section { margin-top: 40px; border-top: 2px solid #333; padding-top: 20px; width: 100%; text-align: center; }
+  
+  #gacha-overlay {
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    background: radial-gradient(circle, #1a1a2e 0%, #000 100%);
+    display: none; z-index: 1000; align-items: center; justify-content: center; overflow: hidden;
+  }
+
+  .meteor {
+    position: absolute; width: 150px; height: 3px;
+    background: linear-gradient(to right, rgba(255,255,255,0), #fff);
+    transform: rotate(-25deg); left: -200px; top: 20%; opacity: 0;
+  }
+  .wish-animate { animation: wishMove 1.5s ease-in forwards; }
+  @keyframes wishMove {
+    0% { left: -200px; top: 20%; opacity: 1; }
+    100% { left: 120%; top: 70%; opacity: 0; }
+  }
+
+  .reveal-card {
+    padding: 15px; border-radius: 12px; text-align: center;
+    background: rgba(255,255,255,0.05); border: 2px solid #fff;
+    transition: transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  }
+  .rarity-5 { box-shadow: 0 0 30px #ffcc00; border-color: #ffcc00; color: #ffcc00; }
+  .rarity-4 { box-shadow: 0 0 20px #a200ff; border-color: #a200ff; color: #a200ff; }
+  .rarity-3 { box-shadow: 0 0 10px #00ccff; border-color: #00ccff; color: #00ccff; }
+
+  .collection { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 20px; justify-content: center; }
+  .collection-item { width: 45px; height: 45px; border: 1px solid #444; border-radius: 5px; overflow: hidden; background: #222;}
+  .collection-item img { width: 100%; height: 100%; object-fit: cover; }
+
+  .digga { text-decoration:none; color:lightseagreen; font-size:20px; }
+</style>
+</head>
+<body>
+
+<div class="scale-container">
+
+  <div class="header">
+    <h2>$ Levi Casino $</h2>
+    <div>Coins: <span id="coins">20</span></div>
+  </div>
+
+<div class="game-container">
+
+  <div class="game-section">
+    <strong>Horse Racing</strong>
+    <div>Bet: <input type="number" id="horseBetAmount" min="1" value="1" style="width:50px"></div>
+    <select id="horseSelect">
+      <option value="1">Lessi 🐎</option>
+      <option value="2">Levi Monroe 🐎</option>
+      <option value="3">Levi Tyson 🐎</option>
+      <option value="4">Levipolion 🐎</option>
+    </select>
+    <button id="raceBtn">Start Race</button>
+    <div class="horse-track" id="horseTrack">
+      <div style="position:absolute; right:0; top:0; width:5px; height:120px; background:red;"></div>
+      <div class="horse" id="horse1" style="top:5px;"><img src="https://i.imgur.com/2lGPLGo.png" width="30" height="30"><div style="font-size:8px;">Lessi</div></div>
+      <div class="horse" id="horse2" style="top:35px;"><img src="https://i.imgur.com/0cPP22V.png" width="30" height="30"><div style="font-size:8px;">Levi Monroe</div></div>
+      <div class="horse" id="horse3" style="top:65px;"><img src="https://i.imgur.com/Y0xO0n8.png" width="30" height="30"><div style="font-size:8px;">Levi Tyson</div></div>
+      <div class="horse" id="horse4" style="top:95px;"><img src="https://i.imgur.com/pbYA8AB.jpeg" width="30" height="30"><div style="font-size:8px;">Levipolion</div></div>
+    </div>
+    <div id="raceResult" style="font-size:12px; margin-top:5px;"></div>
+  </div>
+
+  <div class="game-section">
+    <strong>Roulette</strong>
+    <div>Bet: <input type="number" id="rouletteBetAmount" min="1" value="1" style="width:50px"></div>
+    <select id="betNumber" disabled>
+      <option value="">-Num-</option>
+      <script>for(let i=0;i<=36;i++) document.write(`<option value="${i}">${i}</option>`);</script>
+    </select>
+    <div class="color-buttons">
+      <button id="redBtn">Red</button>
+      <button id="numberBtn">#</button>
+      <button id="blackBtn">Black</button>
+    </div>
+    <div class="wheel-wrapper">
+      <img src="https://i.imgur.com/EIUFfYj.png" class="dd">
+      <img id="wheel" src="https://i.imgur.com/ss7bzNq.png">
+    </div>
+    <button id="rouletteSpinBtn">Spin</button>
+    <div id="rouletteResult" style="font-size:12px;"></div>
+  </div>
+
+  <div class="game-section">
+    <strong>Slots</strong>
+    <div>Bet: <input type="number" id="slotBetAmount" min="1" value="1" style="width:50px"></div>
+    <div class="slot-machine">
+      <div class="reel" id="reel1"><div class="symbols"></div></div>
+      <div class="reel" id="reel2"><div class="symbols"></div></div>
+      <div class="reel" id="reel3"><div class="symbols"></div></div>
+    </div>
+    <button id="slotSpinBtn">Spin</button>
+    <div id="slotResult" style="font-size:12px;"></div>
+  </div>
+
+</div>
+
+<div class="gacha-section">
+    <h3>--- Brawler Gacha ---</h3>
+    <p style="font-size:14px; margin:0;">1 Pull: 5 Coins | 10 Pulls: 50 Coins</p>
+    <div style="display: flex; gap: 10px; justify-content: center; margin-top:10px;">
+        <button id="wishBtn" style="background: #e67e22;">WISH x1</button>
+        <button id="wish10Btn" style="background: #8e44ad;">WISH x10</button>
+    </div>
+    <div class="collection" id="inventory"></div>
+</div>
+
+<div style="margin-top:40px; text-align:center;">
+    <a href="index.html" class="digga">Back to main page</a><br><br>
+    <a href="poker.html" class="digga" target="_blank">To Poker (Separate Coins)</a>
+</div>
+
+</div> <div id="gacha-overlay">
+    <div id="meteor" class="meteor"></div>
+    
+    <div id="reveal" class="reveal-card" style="display:none;">
+        <h2 id="reveal-name"></h2>
+        <div id="reveal-stars" style="font-size:20px;"></div>
+        <img id="reveal-img" src="" style="width: 140px; height: 140px; margin: 10px 0; border-radius: 10px;">
+        <br>
+        <button onclick="closeGacha()" style="background: white; color: black; padding: 5px 20px;">Confirm</button>
+    </div>
+
+    <div id="reveal-multi" style="display:none; flex-direction: column; align-items: center; width: 95%;">
+        <div id="grid-container" style="display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px;"></div>
+        <button onclick="closeGacha()" style="background: white; color: black; margin-top:20px; padding: 10px 40px;">Close</button>
+    </div>
+</div>
+
+<script>
+let coins = 20;
+const coinsDisplay = document.getElementById('coins');
+
+// --- HORSE RACING ---
+const horses = [document.getElementById('horse1'), document.getElementById('horse2'), document.getElementById('horse3'), document.getElementById('horse4')];
+const raceBtn = document.getElementById('raceBtn');
+const raceResult = document.getElementById('raceResult');
+
+raceBtn.addEventListener('click', () => {
+  const bet = parseInt(document.getElementById('horseBetAmount').value);
+  const choice = parseInt(document.getElementById('horseSelect').value)-1;
+  if(bet < 1 || bet > coins) { alert("Invalid bet!"); return; }
+  coins -= bet; coinsDisplay.textContent = coins;
+  raceBtn.disabled = true;
+  horses.forEach(h => h.style.left = '0px');
+  let interval = setInterval(() => {
+    for(let i=0; i<4; i++) {
+      let pos = parseFloat(horses[i].style.left) || 0;
+      pos += Math.random() * 4;
+      horses[i].style.left = pos + 'px';
+      if(pos >= 170) {
+        clearInterval(interval);
+        const winner = i;
+        let msg = winner === choice ? `WIN! +${bet*3}` : "Lost!";
+        if(winner === choice) coins += bet*3;
+        raceResult.textContent = `Winner: Horse ${winner+1}. ${msg}`;
+        coinsDisplay.textContent = coins;
+        raceBtn.disabled = false;
+        break;
+      }
+    }
+  }, 50);
+});
+
+// --- ROULETTE ---
+let curRot = 0;
+let selCol = null;
+let numMod = false;
+const rNums = [0, 32, 15, 19, 4, 21, 2, 25, 17, 34, 6, 27, 13, 36, 11, 30, 8, 23, 10, 5, 24, 16, 33, 1, 20, 14, 31, 9, 22, 18, 29, 7, 28, 12, 35, 3, 26];
+const reds = [1, 3, 5, 7, 9, 12, 14, 16, 18, 19, 21, 23, 25, 27, 30, 32, 34, 36];
+
+const bNumSel = document.getElementById('betNumber');
+const rBtn = document.getElementById('redBtn');
+const blBtn = document.getElementById('blackBtn');
+const nBtn = document.getElementById('numberBtn');
+
+rBtn.onclick = () => { selCol='red'; numMod=false; bNumSel.disabled=true; updateRUI(); };
+blBtn.onclick = () => { selCol='black'; numMod=false; bNumSel.disabled=true; updateRUI(); };
+nBtn.onclick = () => { selCol=null; numMod=true; bNumSel.disabled=false; updateRUI(); };
+
+function updateRUI() {
+    rBtn.classList.toggle('selected', selCol==='red');
+    blBtn.classList.toggle('selected', selCol==='black');
+    nBtn.classList.toggle('selected', numMod);
+}
+
+document.getElementById('rouletteSpinBtn').onclick = () => {
+    const bet = parseInt(document.getElementById('rouletteBetAmount').value);
+    if(bet < 1 || bet > coins || (!selCol && !numMod)) { alert("Check bet/selection!"); return; }
+    coins -= bet; coinsDisplay.textContent = coins;
+    curRot += 2000 + Math.random()*1000;
+    document.getElementById('wheel').style.transform = `rotate(${curRot}deg)`;
+    setTimeout(() => {
+        let deg = (360 - (curRot % 360)) % 360;
+        let idx = Math.floor((deg + (360/37)/2) / (360/37)) % 37;
+        let res = rNums[idx];
+        let win = 0;
+        if(selCol) {
+            let c = reds.includes(res) ? 'red' : (res===0?'none':'black');
+            if(c===selCol) win = Math.ceil(bet*2);
+        } else if(numMod && parseInt(bNumSel.value)===res) {
+            win = bet*35;
+        }
+        coins += win; coinsDisplay.textContent = coins;
+        document.getElementById('rouletteResult').textContent = `Result: ${res}. ${win>0?'WIN!':'Lost'}`;
+    }, 5000);
+};
+
+// --- SLOTS ---
+const slotSymbols = ['https://i.imgur.com/0cPP22V.png','https://i.imgur.com/Y0xO0n8.png','https://i.imgur.com/2lGPLGo.png','https://i.imgur.com/ZHJMphT.jpeg','https://i.imgur.com/pbYA8AB.jpeg'];
+const reelDivs = [document.querySelector('#reel1 .symbols'), document.querySelector('#reel2 .symbols'), document.querySelector('#reel3 .symbols')];
+
+function initSlots() {
+    reelDivs.forEach(r => {
+        r.innerHTML = slotSymbols.concat(slotSymbols).map(s => `<img src="${s}">`).join('');
+    });
+}
+initSlots();
+
+document.getElementById('slotSpinBtn').onclick = async () => {
+    const bet = parseInt(document.getElementById('slotBetAmount').value);
+    if(bet < 1 || coins < bet) return;
+    coins -= bet; coinsDisplay.textContent = coins;
+    
+    const results = await Promise.all(reelDivs.map((r, i) => {
+        return new Promise(res => {
+            let stop = Math.floor(Math.random()*slotSymbols.length);
+            r.style.transition = `top ${2+i}s cubic-bezier(0.45, 0.05, 0.55, 0.95)`;
+            r.style.top = `-${stop * 80 + 400}px`;
+            setTimeout(() => {
+                r.style.transition = 'none';
+                r.style.top = `-${stop * 80}px`;
+                res(stop);
+            }, 2000 + i*1000);
+        });
+    }));
+
+    if(results[0]===results[1] && results[1]===results[2]) { coins += bet*10; document.getElementById('slotResult').textContent="JACKPOT! x10"; }
+    else if(results[0]===results[1] || results[1]===results[2] || results[0]===results[2]) { coins += bet*2; document.getElementById('slotResult').textContent="Pair! x2"; }
+    else { document.getElementById('slotResult').textContent="Lost"; }
+    coinsDisplay.textContent = coins;
+};
+
+// --- GACHA SCRIPT ---
+const pool = [
+    { name: "Levi Tyson", stars: 5, img: "https://i.imgur.com/Y0xO0n8.png" },
+    { name: "Golden Levi", stars: 5, img: "https://i.imgur.com/ZHJMphT.jpeg" },
+    { name: "Levipolion", stars: 4, img: "https://i.imgur.com/pbYA8AB.jpeg" },
+    { name: "Levi Monroe", stars: 4, img: "https://i.imgur.com/0cPP22V.png" },
+    { name: "Lessi", stars: 3, img: "https://i.imgur.com/2lGPLGo.png" },
+    { name: "Brawler Recruit", stars: 3, img: "https://i.imgur.com/jEFcDfE.jpeg" }
+];
+let pity = 0;
+
+document.getElementById('wishBtn').onclick = () => runGacha(1);
+document.getElementById('wish10Btn').onclick = () => runGacha(10);
+
+function runGacha(amt) {
+    if(coins < amt*5) { alert("Not enough coins!"); return; }
+    coins -= amt*5; coinsDisplay.textContent = coins;
+
+    let results = [];
+    let high = 3;
+    for(let i=0; i<amt; i++) {
+        pity++;
+        let roll = Math.random()*100;
+        let item;
+        if(roll < 2 || pity >= 80) { item = pool[Math.floor(Math.random()*2)]; pity=0; }
+        else if(roll < 15 || pity % 10 === 0) { item = pool[2 + Math.floor(Math.random()*2)]; }
+        else { item = pool[4 + Math.floor(Math.random()*2)]; }
+        results.push(item);
+        if(item.stars > high) high = item.stars;
+    }
+
+    const ov = document.getElementById('gacha-overlay');
+    const met = document.getElementById('meteor');
+    ov.style.display = 'flex';
+    document.getElementById('reveal').style.display = 'none';
+    document.getElementById('reveal-multi').style.display = 'none';
+
+    // Set Meteor Color
+    met.style.background = high===5 ? "linear-gradient(to right, transparent, #ffcc00)" : (high===4 ? "linear-gradient(to right, transparent, #a200ff)" : "linear-gradient(to right, transparent, #00ccff)");
+    met.style.filter = `drop-shadow(0 0 15px ${high===5?'#ffcc00':(high===4?'#a200ff':'#00ccff')})`;
+    
+    met.classList.remove('wish-animate');
+    void met.offsetWidth;
+    met.classList.add('wish-animate');
+
+    setTimeout(() => {
+        if(amt === 1) showOne(results[0]);
+        else showTen(results);
+    }, 1200);
+}
+
+function showOne(item) {
+    const rev = document.getElementById('reveal');
+    rev.style.display = 'block';
+    rev.className = `reveal-card rarity-${item.stars}`;
+    document.getElementById('reveal-name').textContent = item.name;
+    document.getElementById('reveal-stars').textContent = "⭐".repeat(item.stars);
+    document.getElementById('reveal-img').src = item.img;
+    addToInv(item);
+}
+
+function showTen(items) {
+    const multi = document.getElementById('reveal-multi');
+    const grid = document.getElementById('grid-container');
+    grid.innerHTML = '';
+    multi.style.display = 'flex';
+    items.forEach(item => {
+        const div = document.createElement('div');
+        div.className = `reveal-card rarity-${item.stars}`;
+        div.style.padding = '5px';
+        div.innerHTML = `<img src="${item.img}" style="width:50px; height:50px; border-radius:5px;"><div style="font-size:9px;">${item.name}</div>`;
+        grid.appendChild(div);
+        addToInv(item);
+    });
+}
+
+function addToInv(item) {
+    const inv = document.getElementById('inventory');
+    const d = document.createElement('div');
+    d.className = 'collection-item';
+    d.innerHTML = `<img src="${item.img}" title="${item.name}">`;
+    inv.appendChild(d);
+}
+
+function closeGacha() { document.getElementById('gacha-overlay').style.display = 'none'; }
+</script>
+</body>
+</html>
