@@ -159,12 +159,12 @@
     <strong>Roulette</strong>
     <div>Bet: <input type="number" id="rouletteBetAmount" min="1" value="1" style="width:50px"></div>
     <select id="betNumber" disabled>
-      <option value="">-Num-</option>
+      <option value="">--select--</option>
       <script>for(let i=0;i<=36;i++) document.write(`<option value="${i}">${i}</option>`);</script>
     </select>
     <div class="color-buttons">
       <button id="redBtn">Red</button>
-      <button id="numberBtn">#</button>
+      <button id="numberBtn">number</button>
       <button id="blackBtn">Black</button>
     </div>
     <div class="wheel-wrapper">
@@ -291,7 +291,7 @@ document.getElementById('rouletteSpinBtn').onclick = () => {
         let win = 0;
         if(selCol) {
             let c = reds.includes(res) ? 'red' : (res===0?'none':'black');
-            if(c===selCol) win = Math.ceil(bet*2);
+            if(c===selCol) win = Math.ceil(bet*3);
         } else if(numMod && parseInt(bNumSel.value)===res) {
             win = bet*35;
         }
