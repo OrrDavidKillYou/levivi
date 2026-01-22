@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Levi Casino & Gacha</title>
+<title>Levi Casino</title>
 <style>
   body {
     margin: 0;
@@ -19,7 +19,6 @@
   .scale-container {
     transform: scale(1.2);
     transform-origin: top center;
-    padding-bottom: 100px;
   }
 
   .header {
@@ -36,11 +35,9 @@
     align-items: flex-start;
     gap: 50px;
     margin-top: 20px;
-    flex-wrap: wrap;
-    max-width: 1000px;
   }
 
-  .game-section { display: flex; flex-direction: column; align-items: center; min-width: 250px; }
+  .game-section { display: flex; flex-direction: column; align-items: center; }
 
   input, select, button {
     margin-top: 10px;
@@ -55,46 +52,84 @@
     background: #28a745;
     color: white;
     margin: 5px 0;
-    font-weight: bold;
   }
 
   button:hover { background: #23963b; }
 
-  .color-buttons button { width: 70px; font-weight: bold; }
+  .color-buttons button {
+    width: 70px;
+    font-weight: bold;
+  }
+
   #redBtn { background-color: red; }
   #blackBtn { background-color: black; color: white; }
   #numberBtn { background-color: blue; }
+
   .selected { border: 2px solid yellow; }
 
   .slot-machine { display: flex; justify-content: center; margin-top: 20px; }
+
   .reel {
-    width: 80px; height: 80px; margin: 0 5px;
-    background: #222; border-radius: 10px;
-    box-shadow: 0 0 10px #000; overflow: hidden; position: relative;
+    width: 80px;
+    height: 80px;
+    margin: 0 5px;
+    background: #222;
+    border-radius: 10px;
+    box-shadow: 0 0 10px #000;
+    overflow: hidden;
+    position: relative;
   }
+
   .symbols { position: absolute; top: 0; width: 100%; }
   .symbols img { display: block; width: 100%; height: 80px; object-fit: contain; }
+
+  #result, #coins { margin-top: 10px; font-size: 16px; min-height: 25px; text-align: center; }
+
+  a.didi { color: teal; text-decoration: none; margin-top: 10px; }
 
   /* Horse racing */
   .horse-track { position: relative; width: 200px; height: 120px; border: 2px solid #555; background: #222; margin-top: 10px; }
   .horse { position: absolute; width: 30px; height: 30px; text-align: center; font-weight: bold; }
 
-  /* Roulette */
-  .wheel-wrapper { width: 150px; height: 150px; position: relative; }
+  /* --- Roulette --- */
+  .wheel-wrapper {
+    width: 150px;
+    height: 150px;
+    position: relative;
+  }
+
   #wheel {
-    width: 100%; height: 100%;
+    width: 100%;
+    height: 100%;
     transition: transform 5s cubic-bezier(0.1, 0.1, 0, 1);
     user-select: none;
+    max-width: 150px;
+    max-height: 150px;
   }
-  .dd { position: absolute; top: -10px; left: 50%; transform: translateX(-50%); height: 35px; z-index: 10; }
 
-  /* --- GACHA STYLES --- */
-  .gacha-section { margin-top: 40px; border-top: 2px solid #333; padding-top: 20px; width: 100%; text-align: center; }
+  .dd {
+    position: absolute;
+    top: -10px;
+    left: 50%;
+    transform: translateX(-50%);
+    height: 35px;
+    width: auto;
+    z-index: 10;
+  }
+  .digga{
+    text-decoration:none;
+    color:lightseagreen;
+    font-size:20px;
+  }
+
+  /* --- GACHA SPECIFIC STYLES --- */
+  .gacha-section { margin-top: 30px; border-top: 1px solid #444; padding-top: 20px; width: 100%; text-align: center; }
   
   #gacha-overlay {
     position: fixed; top: 0; left: 0; width: 100%; height: 100%;
     background: radial-gradient(circle, #1a1a2e 0%, #000 100%);
-    display: none; z-index: 1000; align-items: center; justify-content: center; overflow: hidden;
+    display: none; z-index: 1000; align-items: center; justify-content: center;
+    overflow: hidden;
   }
 
   .meteor {
@@ -102,6 +137,7 @@
     background: linear-gradient(to right, rgba(255,255,255,0), #fff);
     transform: rotate(-25deg); left: -200px; top: 20%; opacity: 0;
   }
+
   .wish-animate { animation: wishMove 1.5s ease-in forwards; }
   @keyframes wishMove {
     0% { left: -200px; top: 20%; opacity: 1; }
@@ -120,8 +156,6 @@
   .collection { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 20px; justify-content: center; }
   .collection-item { width: 45px; height: 45px; border: 1px solid #444; border-radius: 5px; overflow: hidden; background: #222;}
   .collection-item img { width: 100%; height: 100%; object-fit: cover; }
-
-  .digga { text-decoration:none; color:lightseagreen; font-size:20px; }
 </style>
 </head>
 <body>
@@ -136,207 +170,327 @@
 <div class="game-container">
 
   <div class="game-section">
-    <strong>Horse Racing</strong>
-    <div>Bet: <input type="number" id="horseBetAmount" min="1" value="1" style="width:50px"></div>
-    <select id="horseSelect">
-      <option value="1">Lessi 🐎</option>
-      <option value="2">Levi Monroe 🐎</option>
-      <option value="3">Levi Tyson 🐎</option>
-      <option value="4">Levipolion 🐎</option>
-    </select>
+    <div>Bet amount: <input type="number" id="horseBetAmount" min="1" value="1" style="width:60px"></div>
+    <div>Choose horse:
+      <select id="horseSelect">
+        <option value="1">Lessi 🐎</option>
+        <option value="2">Levi Monroe 🐎</option>
+        <option value="3">Levi Tyson 🐎</option>
+        <option value="4">Levipolion 🐎</option>
+      </select>
+    </div>
     <button id="raceBtn">Start Race</button>
     <div class="horse-track" id="horseTrack">
       <div style="position:absolute; right:0; top:0; width:5px; height:120px; background:red;"></div>
-      <div class="horse" id="horse1" style="top:5px;"><img src="https://i.imgur.com/2lGPLGo.png" width="30" height="30"><div style="font-size:8px;">Lessi</div></div>
-      <div class="horse" id="horse2" style="top:35px;"><img src="https://i.imgur.com/0cPP22V.png" width="30" height="30"><div style="font-size:8px;">Levi Monroe</div></div>
-      <div class="horse" id="horse3" style="top:65px;"><img src="https://i.imgur.com/Y0xO0n8.png" width="30" height="30"><div style="font-size:8px;">Levi Tyson</div></div>
-      <div class="horse" id="horse4" style="top:95px;"><img src="https://i.imgur.com/pbYA8AB.jpeg" width="30" height="30"><div style="font-size:8px;">Levipolion</div></div>
+      <div class="horse" id="horse1" style="top:5px;"><img src="https://i.imgur.com/2lGPLGo.png" width="30" height="30"><div style="font-size:10px; text-align:center; color:white;">Lessi</div></div>
+      <div class="horse" id="horse2" style="top:35px;"><img src="https://i.imgur.com/0cPP22V.png" width="30" height="30"><div style="font-size:10px; text-align:center; color:white;">Levi Monroe</div></div>
+      <div class="horse" id="horse3" style="top:65px;"><img src="https://i.imgur.com/Y0xO0n8.png" width="30" height="30"><div style="font-size:10px; text-align:center; color:white;">Levi Tyson</div></div>
+      <div class="horse" id="horse4" style="top:95px;"><img src="https://i.imgur.com/pbYA8AB.jpeg" width="30" height="30"><div style="font-size:10px; text-align:center; color:white;">Levipolion</div></div>
     </div>
-    <div id="raceResult" style="font-size:12px; margin-top:5px;"></div>
+    <div id="raceResult"></div>
   </div>
 
   <div class="game-section">
-    <strong>Roulette</strong>
-    <div>Bet: <input type="number" id="rouletteBetAmount" min="1" value="1" style="width:50px"></div>
-    <select id="betNumber" disabled>
-      <option value="">--select--</option>
-      <script>for(let i=0;i<=36;i++) document.write(`<option value="${i}">${i}</option>`);</script>
-    </select>
+    <div style="height: 250px; width: 180px;"></div>
+  </div>
+
+  <div class="game-section">
+    <div>
+      Bet amount: <input type="number" id="rouletteBetAmount" min="1" value="1" style="width:60px">
+    </div>
+
+    <div>
+      Bet number:
+      <select id="betNumber" disabled>
+        <option value="">--Select--</option>
+        <script>
+            for (let i = 0; i <= 36; i++) document.write(`<option value="${i}">${i}</option>`);
+        </script>
+      </select>
+    </div>
+
     <div class="color-buttons">
       <button id="redBtn">Red</button>
-      <button id="numberBtn">number</button>
+      <button id="numberBtn">Number</button>
       <button id="blackBtn">Black</button>
     </div>
+
     <div class="wheel-wrapper">
       <img src="https://i.imgur.com/EIUFfYj.png" class="dd">
       <img id="wheel" src="https://i.imgur.com/ss7bzNq.png">
     </div>
+
     <button id="rouletteSpinBtn">Spin</button>
-    <div id="rouletteResult" style="font-size:12px;"></div>
+    <div id="rouletteResult"></div>
   </div>
 
   <div class="game-section">
-    <strong>Slots</strong>
-    <div>Bet: <input type="number" id="slotBetAmount" min="1" value="1" style="width:50px"></div>
+    <div>Bet amount: <input type="number" id="slotBetAmount" min="1" value="1" style="width:60px"></div>
+
     <div class="slot-machine">
       <div class="reel" id="reel1"><div class="symbols"></div></div>
       <div class="reel" id="reel2"><div class="symbols"></div></div>
       <div class="reel" id="reel3"><div class="symbols"></div></div>
     </div>
+
     <button id="slotSpinBtn">Spin</button>
-    <div id="slotResult" style="font-size:12px;"></div>
+    <div id="slotResult"></div>
   </div>
 
 </div>
 
 <div class="gacha-section">
-    <h3>--- Brawler Gacha ---</h3>
-    <p style="font-size:14px; margin:0;">1 Pull: 5 Coins | 10 Pulls: 50 Coins</p>
-    <div style="display: flex; gap: 10px; justify-content: center; margin-top:10px;">
-        <button id="wishBtn" style="background: #e67e22;">WISH x1</button>
-        <button id="wish10Btn" style="background: #8e44ad;">WISH x10</button>
+    <h3>--- Levi's Brawler Gacha ---</h3>
+    <p>1 Wish: 5 Coins | 10 Wishes: 50 Coins</p>
+    <div style="display: flex; gap: 10px; justify-content: center;">
+        <button id="wishBtn" style="background: #e67e22; padding: 10px 20px;">WISH x1</button>
+        <button id="wish10Btn" style="background: #8e44ad; padding: 10px 20px;">WISH x10</button>
     </div>
     <div class="collection" id="inventory"></div>
 </div>
 
-<div style="margin-top:40px; text-align:center;">
-    <a href="index.html" class="digga">Back to main page</a><br><br>
-    <a href="poker.html" class="digga" target="_blank">To Poker (Separate Coins)</a>
+<a href="index.html" class="didi">Back to main page</a>
+<br/>
+<a href="poker.html" class="digga" target="_blank">to the poker (your coins will be different)</a>
+
 </div>
 
-</div> <div id="gacha-overlay">
+<div id="gacha-overlay">
     <div id="meteor" class="meteor"></div>
     
     <div id="reveal" class="reveal-card" style="display:none;">
-        <h2 id="reveal-name"></h2>
-        <div id="reveal-stars" style="font-size:20px;"></div>
-        <img id="reveal-img" src="" style="width: 140px; height: 140px; margin: 10px 0; border-radius: 10px;">
+        <h1 id="reveal-name">CHARACTER NAME</h1>
+        <div id="reveal-stars">⭐⭐⭐⭐⭐</div>
+        <img id="reveal-img" src="" style="width: 150px; height: 150px; margin: 15px 0; border-radius: 10px;">
         <br>
-        <button onclick="closeGacha()" style="background: white; color: black; padding: 5px 20px;">Confirm</button>
+        <button onclick="closeGacha()" style="background: white; color: black; padding: 8px 20px;">Confirm</button>
     </div>
 
     <div id="reveal-multi" style="display:none; flex-direction: column; align-items: center; width: 95%;">
-        <div id="grid-container" style="display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px;"></div>
-        <button onclick="closeGacha()" style="background: white; color: black; margin-top:20px; padding: 10px 40px;">Close</button>
+        <div id="grid-container" style="display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; margin-bottom: 20px;">
+            </div>
+        <button onclick="closeGacha()" style="background: white; color: black; padding: 10px 30px; font-weight: bold;">Close Results</button>
     </div>
 </div>
 
 <script>
+// COINS SHARED
 let coins = 20;
 const coinsDisplay = document.getElementById('coins');
 
-// --- HORSE RACING ---
-const horses = [document.getElementById('horse1'), document.getElementById('horse2'), document.getElementById('horse3'), document.getElementById('horse4')];
+/////////////////////
+// HORSE RACING
+const horses = [
+  document.getElementById('horse1'),
+  document.getElementById('horse2'),
+  document.getElementById('horse3'),
+  document.getElementById('horse4')
+];
 const raceBtn = document.getElementById('raceBtn');
 const raceResult = document.getElementById('raceResult');
 
-raceBtn.addEventListener('click', () => {
-  const bet = parseInt(document.getElementById('horseBetAmount').value);
-  const choice = parseInt(document.getElementById('horseSelect').value)-1;
-  if(bet < 1 || bet > coins) { alert("Invalid bet!"); return; }
-  coins -= bet; coinsDisplay.textContent = coins;
-  raceBtn.disabled = true;
-  horses.forEach(h => h.style.left = '0px');
-  let interval = setInterval(() => {
-    for(let i=0; i<4; i++) {
-      let pos = parseFloat(horses[i].style.left) || 0;
-      pos += Math.random() * 4;
-      horses[i].style.left = pos + 'px';
-      if(pos >= 170) {
-        clearInterval(interval);
-        const winner = i;
-        let msg = winner === choice ? `WIN! +${bet*3}` : "Lost!";
-        if(winner === choice) coins += bet*3;
-        raceResult.textContent = `Winner: Horse ${winner+1}. ${msg}`;
-        coinsDisplay.textContent = coins;
-        raceBtn.disabled = false;
-        break;
-      }
+raceBtn.addEventListener('click',()=> {
+  const betAmount = parseInt(document.getElementById('horseBetAmount').value);
+  const chosenHorse = parseInt(document.getElementById('horseSelect').value)-1;
+  if(isNaN(betAmount)||betAmount<1||betAmount>coins){alert("Invalid bet!");return;}
+  coins -= betAmount;
+  coinsDisplay.textContent=coins;
+  raceBtn.disabled=true;
+  raceResult.textContent='';
+  horses.forEach(h=>h.style.left='0px');
+  const finishLine=160;
+  const horsePositions=[0,0,0,0];
+  const raceInterval=setInterval(()=> {
+    for(let i=0;i<horses.length;i++){
+      horsePositions[i]+=Math.random()*5;
+      if(horsePositions[i]>finishLine) horsePositions[i]=finishLine;
+      horses[i].style.left=horsePositions[i]+'px';
     }
-  }, 50);
+    const finished=horsePositions.some(p=>p>=finishLine);
+    if(finished){
+      clearInterval(raceInterval);
+      const winnerIndex=horsePositions.indexOf(Math.max(...horsePositions));
+      let winnerName=horses[winnerIndex].querySelector('div').textContent;
+      let resultText=`${winnerName} won! `;
+      if(winnerIndex===chosenHorse){const winnings=betAmount*3;coins+=winnings; resultText+=`You won ${winnings} coins! 🎉`;}
+      else resultText+='You lost your bet.';
+      raceResult.textContent=resultText;
+      coinsDisplay.textContent=coins;
+      raceBtn.disabled=false;
+    }
+  },100);
 });
 
-// --- ROULETTE ---
-let curRot = 0;
-let selCol = null;
-let numMod = false;
-const rNums = [0, 32, 15, 19, 4, 21, 2, 25, 17, 34, 6, 27, 13, 36, 11, 30, 8, 23, 10, 5, 24, 16, 33, 1, 20, 14, 31, 9, 22, 18, 29, 7, 28, 12, 35, 3, 26];
-const reds = [1, 3, 5, 7, 9, 12, 14, 16, 18, 19, 21, 23, 25, 27, 30, 32, 34, 36];
+/////////////////////
+// ROULETTE SCRIPT
+let currentRotation = 0;
+let selectedColor = null;
+let numberMode = false;
 
-const bNumSel = document.getElementById('betNumber');
-const rBtn = document.getElementById('redBtn');
-const blBtn = document.getElementById('blackBtn');
-const nBtn = document.getElementById('numberBtn');
+const rouletteNumbers = [
+    0, 32, 15, 19, 4, 21, 2, 25, 17, 34, 6,
+    27, 13, 36, 11, 30, 8, 23, 10, 5, 24,
+    16, 33, 1, 20, 14, 31, 9, 22, 18, 29,
+    7, 28, 12, 35, 3, 26
+];
+const redNumbers = [1, 3, 5, 7, 9, 12, 14, 16, 18, 19, 21, 23, 25, 27, 30, 32, 34, 36];
 
-rBtn.onclick = () => { selCol='red'; numMod=false; bNumSel.disabled=true; updateRUI(); };
-blBtn.onclick = () => { selCol='black'; numMod=false; bNumSel.disabled=true; updateRUI(); };
-nBtn.onclick = () => { selCol=null; numMod=true; bNumSel.disabled=false; updateRUI(); };
+const betNumberSelect = document.getElementById('betNumber');
+const redBtn = document.getElementById('redBtn');
+const blackBtn = document.getElementById('blackBtn');
+const numberBtn = document.getElementById('numberBtn');
+const rouletteSpinBtn = document.getElementById('rouletteSpinBtn');
 
-function updateRUI() {
-    rBtn.classList.toggle('selected', selCol==='red');
-    blBtn.classList.toggle('selected', selCol==='black');
-    nBtn.classList.toggle('selected', numMod);
+function updateButtonHighlights() {
+    redBtn.classList.toggle('selected', selectedColor === 'red');
+    blackBtn.classList.toggle('selected', selectedColor === 'black');
+    numberBtn.classList.toggle('selected', numberMode);
 }
 
-document.getElementById('rouletteSpinBtn').onclick = () => {
-    const bet = parseInt(document.getElementById('rouletteBetAmount').value);
-    if(bet < 1 || bet > coins || (!selCol && !numMod)) { alert("Check bet/selection!"); return; }
-    coins -= bet; coinsDisplay.textContent = coins;
-    curRot += 2000 + Math.random()*1000;
-    document.getElementById('wheel').style.transform = `rotate(${curRot}deg)`;
+function activateColor(color) {
+    selectedColor = color;
+    numberMode = false;
+    betNumberSelect.disabled = true;
+    betNumberSelect.value = '';
+    updateButtonHighlights();
+}
+
+function activateNumberMode() {
+    selectedColor = null;
+    numberMode = true;
+    betNumberSelect.disabled = false;
+    updateButtonHighlights();
+}
+
+redBtn.addEventListener('click', () => activateColor('red'));
+blackBtn.addEventListener('click', () => activateColor('black'));
+numberBtn.addEventListener('click', () => activateNumberMode());
+
+betNumberSelect.addEventListener('change', () => {
+    if (!numberMode) { betNumberSelect.value = ''; alert("Press Number button first!"); }
+});
+
+rouletteSpinBtn.addEventListener('click', () => {
+    const betAmount = parseInt(document.getElementById('rouletteBetAmount').value);
+    const betNumber = parseInt(betNumberSelect.value);
+    if (betAmount > coins || betAmount < 1) { alert("Invalid bet!"); return; }
+    if (!selectedColor && (!numberMode || isNaN(betNumber))) { alert("Select a number or color!"); return; }
+
+    coins -= betAmount;
+    coinsDisplay.textContent = coins;
+    rouletteSpinBtn.disabled = true;
+    document.getElementById('rouletteResult').textContent = '';
+
+    const extraSpin = Math.floor(Math.random() * 3000) + 2000;
+    currentRotation += extraSpin;
+    document.getElementById('wheel').style.transform = `rotate(${currentRotation}deg)`;
+
     setTimeout(() => {
-        let deg = (360 - (curRot % 360)) % 360;
-        let idx = Math.floor((deg + (360/37)/2) / (360/37)) % 37;
-        let res = rNums[idx];
-        let win = 0;
-        if(selCol) {
-            let c = reds.includes(res) ? 'red' : (res===0?'none':'black');
-            if(c===selCol) win = Math.ceil(bet*3);
-        } else if(numMod && parseInt(bNumSel.value)===res) {
-            win = bet*35;
+        const normalizedRotation = currentRotation % 360;
+        const degreesPerNumber = 360 / rouletteNumbers.length;
+        const index = Math.floor(((360 - normalizedRotation + degreesPerNumber / 2) % 360) / degreesPerNumber);
+        const resultNumber = rouletteNumbers[index];
+
+        let resultText = `Result: ${resultNumber}. `;
+        let winnings = 0;
+
+        if (selectedColor) {
+            const resultColor = redNumbers.includes(resultNumber) ? 'red' : (resultNumber === 0 ? 'none' : 'black');
+            if (resultColor === selectedColor) { winnings = Math.ceil(betAmount * 1.5); coins += winnings; resultText += `You won! +${winnings} coins.`; }
+            else resultText += "You lost!";
+        } else if (numberMode && !isNaN(betNumber)) {
+            if (resultNumber === 0 && betNumber === 0) { winnings = betAmount * 1000; }
+            else if (resultNumber === betNumber) { winnings = betAmount * 30; }
+            coins += winnings;
+            resultText += (resultNumber === betNumber) ? `You won! +${winnings} coins.` : "You lost!";
         }
-        coins += win; coinsDisplay.textContent = coins;
-        document.getElementById('rouletteResult').textContent = `Result: ${res}. ${win>0?'WIN!':'Lost'}`;
+
+        coinsDisplay.textContent = coins;
+        document.getElementById('rouletteResult').textContent = resultText;
+        updateButtonHighlights();
+        rouletteSpinBtn.disabled = false;
     }, 5000);
-};
+});
 
-// --- SLOTS ---
-const slotSymbols = ['https://i.imgur.com/0cPP22V.png','https://i.imgur.com/Y0xO0n8.png','https://i.imgur.com/2lGPLGo.png','https://i.imgur.com/ZHJMphT.jpeg','https://i.imgur.com/pbYA8AB.jpeg'];
-const reelDivs = [document.querySelector('#reel1 .symbols'), document.querySelector('#reel2 .symbols'), document.querySelector('#reel3 .symbols')];
+/////////////////////
+// SLOT MACHINE SCRIPT
+const reels = [
+    document.querySelector('#reel1 .symbols'),
+    document.querySelector('#reel2 .symbols'),
+    document.querySelector('#reel3 .symbols')
+];
+const symbols = [
+    'https://i.imgur.com/0cPP22V.png',
+    'https://i.imgur.com/Y0xO0n8.png',
+    'https://i.imgur.com/2lGPLGo.png',
+    'https://i.imgur.com/ZHJMphT.jpeg',
+    'https://i.imgur.com/pbYA8AB.jpeg',
+    'https://i.imgur.com/jEFcDfE.jpeg'
+];
 
-function initSlots() {
-    reelDivs.forEach(r => {
-        r.innerHTML = slotSymbols.concat(slotSymbols).map(s => `<img src="${s}">`).join('');
+function updateReels() {
+    reels.forEach(reel => {
+        const strip = symbols.concat(symbols).concat(symbols);
+        reel.innerHTML = strip.map(src => `<img src="${src}">`).join('');
+        reel.style.top = '0px';
     });
 }
-initSlots();
+updateReels();
 
-document.getElementById('slotSpinBtn').onclick = async () => {
-    const bet = parseInt(document.getElementById('slotBetAmount').value);
-    if(bet < 1 || coins < bet) return;
-    coins -= bet; coinsDisplay.textContent = coins;
-    
-    const results = await Promise.all(reelDivs.map((r, i) => {
-        return new Promise(res => {
-            let stop = Math.floor(Math.random()*slotSymbols.length);
-            r.style.transition = `top ${2+i}s cubic-bezier(0.45, 0.05, 0.55, 0.95)`;
-            r.style.top = `-${stop * 80 + 400}px`;
-            setTimeout(() => {
-                r.style.transition = 'none';
-                r.style.top = `-${stop * 80}px`;
-                res(stop);
-            }, 2000 + i*1000);
-        });
-    }));
+function spinReel(reel, spins, delay) {
+    return new Promise(resolve => {
+        let position = 0;
+        const symbolHeight = 80;
+        const interval = setInterval(() => {
+            position += 1;
+            reel.style.top = `-${(position % symbols.length) * symbolHeight}px`;
+        }, delay);
 
-    if(results[0]===results[1] && results[1]===results[2]) { coins += bet*10; document.getElementById('slotResult').textContent="JACKPOT! x10"; }
-    else if(results[0]===results[1] || results[1]===results[2] || results[0]===results[2]) { coins += bet*2; document.getElementById('slotResult').textContent="Pair! x2"; }
-    else { document.getElementById('slotResult').textContent="Lost"; }
+        setTimeout(() => {
+            clearInterval(interval);
+            const stopIndex = Math.floor(Math.random() * symbols.length);
+            reel.style.top = `-${stopIndex * symbolHeight}px`;
+            resolve(stopIndex);
+        }, spins * delay);
+    });
+}
+
+document.getElementById('slotSpinBtn').addEventListener('click', async () => {
+    const betAmount = parseInt(document.getElementById('slotBetAmount').value);
+    if (isNaN(betAmount) || betAmount < 1) { alert("Enter valid bet!"); return; }
+    if (coins < betAmount) { alert("Not enough coins!"); return; }
+
+    coins -= betAmount;
     coinsDisplay.textContent = coins;
-};
+    document.getElementById('slotResult').textContent = '';
+    const spinBtn = document.getElementById('slotSpinBtn');
+    spinBtn.disabled = true;
 
-// --- GACHA SCRIPT ---
-const pool = [
+    const spinResults = await Promise.all([
+        spinReel(reels[0], 30 + Math.floor(Math.random() * 10), 50),
+        spinReel(reels[1], 35 + Math.floor(Math.random() * 10), 50),
+        spinReel(reels[2], 40 + Math.floor(Math.random() * 10), 50)
+    ]);
+
+    if (spinResults[0] === spinResults[1] && spinResults[1] === spinResults[2]) {
+        const winnings = betAmount * 100;
+        coins += winnings;
+        document.getElementById('slotResult').textContent = `Jackpot! +${winnings} coins! 🎉`;
+    } else if (spinResults[0] === spinResults[1] || spinResults[1] === spinResults[2] || spinResults[0] === spinResults[2]) {
+        const winnings = betAmount * 3;
+        coins += winnings;
+        document.getElementById('slotResult').textContent = `You got a pair! +${winnings} coins.`;
+    } else {
+        document.getElementById('slotResult').textContent = "You lost!";
+    }
+
+    coinsDisplay.textContent = coins;
+    spinBtn.disabled = false;
+});
+
+/////////////////////
+// GACHA SCRIPT
+const gachaPool = [
     { name: "Levi Tyson", stars: 5, img: "https://i.imgur.com/Y0xO0n8.png" },
     { name: "Golden Levi", stars: 5, img: "https://i.imgur.com/ZHJMphT.jpeg" },
     { name: "Levipolion", stars: 4, img: "https://i.imgur.com/pbYA8AB.jpeg" },
@@ -344,82 +498,122 @@ const pool = [
     { name: "Lessi", stars: 3, img: "https://i.imgur.com/2lGPLGo.png" },
     { name: "Brawler Recruit", stars: 3, img: "https://i.imgur.com/jEFcDfE.jpeg" }
 ];
-let pity = 0;
 
-document.getElementById('wishBtn').onclick = () => runGacha(1);
-document.getElementById('wish10Btn').onclick = () => runGacha(10);
+let pityCounter = 0;
 
-function runGacha(amt) {
-    if(coins < amt*5) { alert("Not enough coins!"); return; }
-    coins -= amt*5; coinsDisplay.textContent = coins;
+document.getElementById('wishBtn').addEventListener('click', () => performWish(1));
+document.getElementById('wish10Btn').addEventListener('click', () => performWish(10));
 
-    let results = [];
-    let high = 3;
-    for(let i=0; i<amt; i++) {
-        pity++;
-        let roll = Math.random()*100;
-        let item;
-        if(roll < 2 || pity >= 80) { item = pool[Math.floor(Math.random()*2)]; pity=0; }
-        else if(roll < 15 || pity % 10 === 0) { item = pool[2 + Math.floor(Math.random()*2)]; }
-        else { item = pool[4 + Math.floor(Math.random()*2)]; }
-        results.push(item);
-        if(item.stars > high) high = item.stars;
+function performWish(count) {
+    const cost = count * 5;
+    if (coins < cost) { alert("Not enough coins!"); return; }
+    
+    coins -= cost;
+    coinsDisplay.textContent = coins;
+
+    const results = [];
+    let highestRarity = 3;
+
+    for(let i=0; i < count; i++) {
+        pityCounter++;
+        let result;
+        const rand = Math.random() * 100;
+
+        if (rand < 2 || pityCounter >= 80) { 
+            result = gachaPool.filter(item => item.stars === 5)[Math.floor(Math.random() * 2)];
+            pityCounter = 0;
+        } else if (rand < 15 || pityCounter % 10 === 0) { 
+            result = gachaPool.filter(item => item.stars === 4)[Math.floor(Math.random() * 2)];
+        } else {
+            result = gachaPool.filter(item => item.stars === 3)[Math.floor(Math.random() * 2)];
+        }
+        
+        results.push(result);
+        if (result.stars > highestRarity) highestRarity = result.stars;
     }
 
-    const ov = document.getElementById('gacha-overlay');
-    const met = document.getElementById('meteor');
-    ov.style.display = 'flex';
-    document.getElementById('reveal').style.display = 'none';
-    document.getElementById('reveal-multi').style.display = 'none';
+    animateWish(results, highestRarity);
+}
+
+function animateWish(results, highestRarity) {
+    const overlay = document.getElementById('gacha-overlay');
+    const meteor = document.getElementById('meteor');
+    const singleReveal = document.getElementById('reveal');
+    const multiReveal = document.getElementById('reveal-multi');
 
     // Set Meteor Color
-    met.style.background = high===5 ? "linear-gradient(to right, transparent, #ffcc00)" : (high===4 ? "linear-gradient(to right, transparent, #a200ff)" : "linear-gradient(to right, transparent, #00ccff)");
-    met.style.filter = `drop-shadow(0 0 15px ${high===5?'#ffcc00':(high===4?'#a200ff':'#00ccff')})`;
+    if (highestRarity === 5) {
+        meteor.style.background = "linear-gradient(to right, transparent, #ffcc00)";
+        meteor.style.filter = "drop-shadow(0 0 20px #ffcc00)";
+    } else if (highestRarity === 4) {
+        meteor.style.background = "linear-gradient(to right, transparent, #a200ff)";
+        meteor.style.filter = "drop-shadow(0 0 20px #a200ff)";
+    } else {
+        meteor.style.background = "linear-gradient(to right, transparent, #00ccff)";
+        meteor.style.filter = "drop-shadow(0 0 20px #00ccff)";
+    }
+
+    overlay.style.display = 'flex';
+    singleReveal.style.display = 'none';
+    multiReveal.style.display = 'none';
     
-    met.classList.remove('wish-animate');
-    void met.offsetWidth;
-    met.classList.add('wish-animate');
+    meteor.classList.remove('wish-animate');
+    void meteor.offsetWidth; 
+    meteor.classList.add('wish-animate');
 
     setTimeout(() => {
-        if(amt === 1) showOne(results[0]);
-        else showTen(results);
+        if (results.length === 1) {
+            showSingleReveal(results[0]);
+        } else {
+            showMultiReveal(results);
+        }
     }, 1200);
 }
 
-function showOne(item) {
-    const rev = document.getElementById('reveal');
-    rev.style.display = 'block';
-    rev.className = `reveal-card rarity-${item.stars}`;
+function showSingleReveal(item) {
+    const reveal = document.getElementById('reveal');
+    reveal.style.display = 'block';
+    reveal.className = `reveal-card rarity-${item.stars}`;
     document.getElementById('reveal-name').textContent = item.name;
     document.getElementById('reveal-stars').textContent = "⭐".repeat(item.stars);
     document.getElementById('reveal-img').src = item.img;
-    addToInv(item);
+    reveal.style.transform = 'scale(1)';
+    addToInventory(item);
 }
 
-function showTen(items) {
+function showMultiReveal(items) {
     const multi = document.getElementById('reveal-multi');
-    const grid = document.getElementById('grid-container');
-    grid.innerHTML = '';
+    const container = document.getElementById('grid-container');
+    container.innerHTML = '';
     multi.style.display = 'flex';
+
     items.forEach(item => {
-        const div = document.createElement('div');
-        div.className = `reveal-card rarity-${item.stars}`;
-        div.style.padding = '5px';
-        div.innerHTML = `<img src="${item.img}" style="width:50px; height:50px; border-radius:5px;"><div style="font-size:9px;">${item.name}</div>`;
-        grid.appendChild(div);
-        addToInv(item);
+        const card = document.createElement('div');
+        card.className = `reveal-card rarity-${item.stars}`;
+        card.style.transform = 'scale(0.8)';
+        card.style.margin = '0';
+        card.innerHTML = `
+            <div style="font-size:10px">${item.name}</div>
+            <img src="${item.img}" style="width:60px; height:60px; border-radius:5px;">
+            <div style="font-size:10px">${"⭐".repeat(item.stars)}</div>
+        `;
+        container.appendChild(card);
+        addToInventory(item);
     });
 }
 
-function addToInv(item) {
+function addToInventory(item) {
     const inv = document.getElementById('inventory');
-    const d = document.createElement('div');
-    d.className = 'collection-item';
-    d.innerHTML = `<img src="${item.img}" title="${item.name}">`;
-    inv.appendChild(d);
+    const slot = document.createElement('div');
+    slot.className = 'collection-item';
+    slot.innerHTML = `<img src="${item.img}" title="${item.name}">`;
+    inv.appendChild(slot);
 }
 
-function closeGacha() { document.getElementById('gacha-overlay').style.display = 'none'; }
+function closeGacha() {
+    document.getElementById('gacha-overlay').style.display = 'none';
+}
 </script>
+
 </body>
 </html>
